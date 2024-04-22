@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Property Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/style.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.js" integrity="sha256-2JRzNxMJiS0aHOJjG+liqsEOuBb6++9cY4dSOyiijX4=" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/d8e35abd5c.js" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js'></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYzXj5wF4L6mChyyc5xwfb2QT1QEZ9VN8&callback=initMap&libraries=&v=weekly"
+      defer></script>
+</head>
+<body>
+    {% extends "header.html" %}
+
+	{% block content %}
+    <div class="main-container">
+        <img src="{{url_for('static',filename='house_img.jpg')}}" >
+        <div class="desc2">
+            <div class="child1">
+            <p class="item-title">{{ data[0][3]|string + " Bedroom House Located at " + area_dict[data[0][-6]|int] + " Added by "+ data[0][-1]|string}}</p>
+            {% if data[0][10] == 5%}
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+            {% elif data[0][10] == 4%}
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star "></i>
+            {% elif data[0][10] == 3%}
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+            {% elif data[0][10] == 2%}
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+            {% elif data[0][10] == 1%}
+                <i class="fas fa-star checked"></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+                <i class="fas fa-star "></i>
+            {% endif %}
+            <div class="child2">
+            <ul>  
+                <li>
+                    <a class="item-desc">{{"Area : "+data[0][5]|string+" sqft"}}</a>
+                </li>
+                <li>
+                    <a class="item-desc">{{"Year Built : "+data[0][-9]|string}}</a>
+                </li>
+                <li>
+                    <a class="item-desc">{{"Asking Price : "+data[0][2]|string+" $"}}</a>
+                </li>
+                <li>
+                    <a class="item-desc">{{"Predicted Price : "+pred_val|string+" $"}}</a>
+                </li>
+                <li>
+                    <a class="item-desc">{{"Bedrooms : "+data[0][3]|string}}</a>
+                </li>
+                <li>
+                    <a class="item-desc">{{"Bathrooms : "+data[0][4]|string}}</a>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <a class="item-desc">{{"Floors : "+data[0][7]|string}}</a>
+                </li>
+                <li>{% if data[0][8]|string == "1" %}
+                    <a class="item-desc" style="color:green">Waterfront : Yes</a>
+                    {% else %}
+                    <a class="item-desc" style="color:red">Waterfront : No</a>
+                    {% endif %}
+                </li>
+                <li>
+                    {% if data[0][9]|string == "0" %}
+                        <a class="item-desc">View : Average</a>
+                    {% elif data[0][9]|string == "1"%}
+                        <a class="item-desc">View : Better</a>
+                    {% elif data[0][9]|string == "2"%}
+                        <a class="item-desc">View : Good</a>
+                    {% elif data[0][9]|string == "3"%}
+                        <a class="item-desc">View : Great</a>
+                    {% elif data[0][9]|string == "4"%}  
+                        <a class="item-desc">View : Best</a>
+                    {% endif %}
+                </li>
+                <li>
+                    {% if data[0][11]|int <= 5 %}
+                    <a class="item-desc" style="color:red">Quality of Construction : Average</a>
+                    {% elif data[0][11]|int <= 10%}
+                    <a class="item-desc" style="color:#37d4a2">Quality of Construction : Good</a>
+                    {% elif data[0][11]|int <= 13%}
+                    <a class="item-desc" style="color:green">Quality of Construction : HIgh</a>
+                    {% endif %}
+                </li>
+                <li>
+                    {% if data[0][-8]|string == "1" %}
+                    <a class="item-desc" style="color:green">Is renovated ? : Yes</a>
+                    {% else %}
+                    <a class="item-desc" style="color:red">Is renovated ? : No</a>
+                    {% endif %}
+                </li>
+            </ul>
+            </div>
+            </div>  
+        </div>
+        <div id="map"></div>
+    </div>
+    <h3 class="related_header">Related Properties</h3>
+    <div class="related_properties">
+        {% for property in related_houses%}
+            <div class="property">
+                <div class="img">
+                    <a href="/property/{{property[0]}}"><img src="{{url_for('static',filename='house_img.jpg')}}"></a>
+                </div>
+                <div class="property-desc">
+                    <p>Price: {{property[2]}} Rs</p>
+                    <p>Area: {{property[5]}} Sqft</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="chart-super-container">
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+    <script>
+        function initMap() {
+        const uluru = { lat: {{data[0][-5]}}, lng:{{data[0][-4]}} };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 9,
+            center: uluru,
+        });
+        const marker = new google.maps.Marker({
+            position: uluru,
+            map: map,
+        });
+        }
+	</script>
+    <script>
+        Chart.defaults.global.responsive = true;
+         var chartData = {
+        labels : [{% for item in range(1,25) %}
+                    "{{item}}",
+                    {% endfor %}],
+        datasets : [{
+            label: ' Monthly Forecast ',
+            fill: true,
+            lineTension: 0.1,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data : [{% for item in future_values %}
+                        {{item}},
+                    {% endfor %}],
+            spanGaps: false
+        }]
+        }
+        
+        var ctx = document.getElementById("myChart").getContext("2d");
+        
+        var myChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        });
+</script>
+    {% endblock %}
+</body>
+</html>
+
